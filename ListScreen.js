@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -8,39 +8,34 @@ import {
   FlatList,
   TouchableOpacity,
 } from "react-native";
+
 import Icon from "react-native-vector-icons/Ionicons";
 
-function item({ id, title }) {
-  return (
-    <View style={styles.contents}>
-      <Text>{id}</Text>
-      <Text>{title}</Text>
-    </View>
-  );
-}
-
-const DATA = [
-  {
-    id: "bd7acbea-c1b1-46c2-aed5-3ad53abb28ba",
-    title: "A Item",
-  },
-  {
-    id: "3ac68afc-c605-48d3-a4f8-fbd91aa97f63",
-    title: "C Item",
-  },
-  {
-    id: "58694a0f-3da1-471f-bd96-145571e29d72",
-    title: "B Item",
-  },
-];
-
 function Lists({ navigation }) {
-  const renderItem = ({ item }) => (
-    <View style={styles.listitems}>
-      <TouchableOpacity onPress={() => navigation.navigate("Route")}>
-        <Text style={styles.item}>{item.title}</Text>
-      </TouchableOpacity>
-    </View>
+  const [DATA, set_DATA] = useState([]);
+
+  const list_Items = ["안녕", "잘가", "바이", "헬로", "Hi", "Bye", "Cick", "D"];
+
+  useEffect(() => {
+    set_DATA(list_Items);
+  }, []);
+
+  const sort_Array_Alphabetically = () => {
+    set_DATA(list_Items.sort());
+  };
+
+  const ItemRender = ({ item }) => (
+    <TouchableOpacity
+      onPress={() =>
+        navigation.navigate("Route", {
+          id: item,
+        })
+      }
+    >
+      <View style={{ padding: 12 }}>
+        <Text> {item} </Text>
+      </View>
+    </TouchableOpacity>
   );
   return (
     <SafeAreaView style={styles.container}>
@@ -51,7 +46,7 @@ function Lists({ navigation }) {
           </Text>
         </TouchableOpacity>
         <Text style={styles.headertext}>이동 목록</Text>
-        <TouchableOpacity onPress={() => navigation.navigate("Input")}>
+        <TouchableOpacity onPress={() => sort_Array_Alphabetically()}>
           <Text style={styles.headertext}>
             <Icon name="menu-outline" size={40}></Icon>
           </Text>
@@ -59,9 +54,10 @@ function Lists({ navigation }) {
       </View>
       <View style={styles.contents}>
         <FlatList
-          keyExtractor={(item) => item.id}
+          keyExtractor={(itemData) => itemData.toString()}
+          extraData={DATA}
           data={DATA}
-          renderItem={renderItem}
+          renderItem={(itemData) => <ItemRender item={itemData.item} />}
         />
       </View>
     </SafeAreaView>

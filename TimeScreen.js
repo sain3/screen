@@ -1,4 +1,4 @@
-import React, { Component, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -43,6 +43,17 @@ function Insert({ navigation }) {
     onChangeDate(time);
     hideDatePicker();
   };
+  function check() {
+    if (value) {
+      navigation.navigate("List", {
+        id: value,
+        ttime: helpee,
+      });
+    } else {
+      alert("요일을 선택하세요!");
+    }
+  }
+  let helpee = format(new Date(date), "p", { locale: ko });
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
@@ -71,9 +82,7 @@ function Insert({ navigation }) {
           <Text style={styles.text}>시간</Text>
 
           <TouchableOpacity style={styles.viewtime} onPress={showDatePicker}>
-            <Text style={styles.time}>
-              {format(new Date(date), "p", { locale: ko })}
-            </Text>
+            <Text style={styles.time}>{helpee}</Text>
           </TouchableOpacity>
           <DateTimePickerModal
             isVisible={isDatePickerVisible}
@@ -84,7 +93,7 @@ function Insert({ navigation }) {
           />
 
           <View style={styles.button}>
-            <TouchableOpacity onPress={() => navigation.navigate("List")}>
+            <TouchableOpacity onPress={() => check()}>
               <Text style={styles.comfirm}>확인</Text>
             </TouchableOpacity>
           </View>

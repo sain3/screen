@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 
-function Routes({ navigation }) {
+function Routes({ route, navigation }) {
   const [day, setday] = useState("");
   const sorted = () => setday(day.sort);
   return (
@@ -28,7 +28,9 @@ function Routes({ navigation }) {
           </Text>
         </TouchableOpacity>
       </View>
-      <View style={styles.contents}></View>
+      <View style={styles.contents}>
+        <Text>{route.params.id}</Text>
+      </View>
     </SafeAreaView>
   );
 }
