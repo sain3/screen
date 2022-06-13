@@ -90,6 +90,7 @@ function Insert({ navigation }) {
             onConfirm={handleConfirm}
             onCancel={hideDatePicker}
             date={date}
+            isDarkModeEnabled={true}
           />
 
           <View style={styles.button}>
