@@ -17,7 +17,7 @@ const db = SQLite.openDatabase("db.db");
 
 // var xhr = new XMLHttpRequest();
 // var url =
-//   "https://api.odsay.com/v1/api/searchPubTransPathT?lang=0&SX=127.11&SY=36.9927&EX=127.2635&EY=37.0094&apiKey=Qg9KzIkJFCV8wMtZUhSJtcOkDn15Crje91AZj/RazU8";
+//   "https://api.odsay.com/v1/api/searchPubTransPathT?lang=0&SX=127.11&SY=36.9927&EX=127.2635&EY=37.0094&apiKey={API_KEY}";
 // xhr.open("GET", url, true);
 // xhr.send();
 // xhr.onreadystatechange = function () {
