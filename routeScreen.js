@@ -16,20 +16,21 @@ function Routes({ route, navigation }) {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.navigate("List")}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
           <Text style={styles.headertext}>
-            <Icon name="arrow-back-circle-outline" size={40}></Icon>
+            <Icon name="chevron-back-outline" size={55}></Icon>
           </Text>
         </TouchableOpacity>
         <Text style={styles.headertext}>이동 경로</Text>
         <TouchableOpacity onPress={() => navigation.navigate("Input")}>
           <Text style={styles.headertext}>
-            <Icon name="menu-outline" size={40}></Icon>
+            <Icon name="menu-outline" size={55}></Icon>
           </Text>
         </TouchableOpacity>
       </View>
       <View style={styles.contents}>
         <Text>{route.params.id}</Text>
+        <Text>{route.params.ns}</Text>
       </View>
     </SafeAreaView>
   );
@@ -40,19 +41,22 @@ export default Routes;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#e1f5fe",
   },
   header: {
     flex: 0.15,
-    backgroundColor: "#2c2c2c",
     alignItems: "center",
-    justifyContent: "space-around",
+    justifyContent: "space-between",
     flexDirection: "row",
+    borderBottomColor: "gray",
+    borderBottomWidth: 1,
   },
   headertext: {
-    color: "white",
     fontSize: 40,
+    fontWeight: "bold",
   },
   contents: {
     flex: 1.1,
+    backgroundColor: "white",
   },
 });
