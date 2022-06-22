@@ -126,6 +126,7 @@ function Insert({ navigation }) {
             onConfirm={handleConfirm}
             onCancel={hideDatePicker}
             date={date}
+            isDarkModeEnabled={true}
           />
           <TouchableOpacity style={styles.button} onPress={() => check()}>
             <Text style={styles.comfirm}>확인</Text>
