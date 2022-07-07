@@ -1,45 +1,59 @@
 import React, { useState, useEffect } from "react";
+
 import {
   View,
   Text,
-  Button,
   StyleSheet,
   SafeAreaView,
   FlatList,
   TouchableOpacity,
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
+import { Menu, MenuItem, MenuDivider } from "react-native-material-menu";
 import * as SQLite from "expo-sqlite";
+
 const db = SQLite.openDatabase("db.db");
 
 function Lists({ navigation, route }) {
   const [data, setdata] = useState([]);
   const [sortdata, setsortdata] = useState([]);
   useEffect(() => {
-    db.transaction((tx) => {
-      // 데이터 수정 및 추가 tx.executeSql(`update bye set time ='11:30' WHERE id = '50'`),
-      // 레코드 삭제 tx.executeSql(`DELETE from home WHERE id = '1229'`);
-      tx.executeSql(`select * from home`, [], (tx, result) => {
-        let name = [];
-        for (let i = 0; i < result.rows.length; ++i) {
-          name.push(result.rows._array[i]);
-        }
-        setdata(name);
+    b();
+    async function b() {
+      let incitydata = await InData();
+      let database = await IncityDB(incitydata);
+    }
+    async function InData() {
+      return new Promise(function (resolve) {
+        db.transaction((tx) => {
+          let name = [];
+          tx.executeSql(`select * from home`, [], (tx, result) => {
+            for (let i = 0; i < result.rows.length; ++i) {
+              name.push(result.rows._array[i]);
+              setdata(name);
+              console.log(data);
+            }
+          });
+        });
       });
-    });
+    }
   }, []);
-
+  const [a, seta] = useState("");
   useEffect(() => {
     setsortdata(sortdata);
   }, []);
-
-  const sort_Array_Alphabetically = () => {
-    setsortdata(
-      data.sort(function (a, b) {
-        return parseFloat(a.totalTime) - parseFloat(b.totalTime);
-      })
-    );
+  const [visible, setVisible] = useState(false);
+  const hideMenu = () => {
+    setVisible(false);
   };
+  const showMenu = () => setVisible(true);
+  // const sort_Array_Alphabetically = () => {
+  //   setsortdata(
+  //     data.sort(function (a, b) {
+  //       return parseFloat(a.totalTime) - parseFloat(b.totalTime);
+  //     })
+  //   );
+  // };
   const setTime = (a) => {
     let time = new Date();
     let current = time.getHours() * 60 + time.getMinutes();
@@ -62,10 +76,18 @@ function Lists({ navigation, route }) {
             도착시간 : {setTime(item.totalTime)}
           </Text>
           <View style={styles.path}>
-            <Icon size={50} name="bus-outline"></Icon>
-            <Text>{item.number}</Text>
+            {item.pathType === 2 ? (
+              <Icon size={50} name="bus-outline"></Icon>
+            ) : (
+              <Icon size={50} name="train-outline"></Icon>
+            )}
+            {item.pathType === 2 ? (
+              <Text>{item.number}</Text>
+            ) : (
+              <Text>{item.subwayName}</Text>
+            )}
           </View>
-          <Text style={styles.fare}>요금 : {item.fare}원</Text>
+          <Text style={styles.fare}>요금 : {item.fare.toLocaleString()}원</Text>
         </View>
       </SafeAreaView>
     </TouchableOpacity>
@@ -79,21 +101,74 @@ function Lists({ navigation, route }) {
           </Text>
         </TouchableOpacity>
         <Text style={styles.headertext}>이동 목록</Text>
-        <TouchableOpacity onPress={() => sort_Array_Alphabetically()}>
-          <Text style={styles.headertext}>
-            <Icon name="menu-outline" size={55}></Icon>
-          </Text>
-        </TouchableOpacity>
+        <Menu
+          visible={visible}
+          anchor={
+            <Text onPress={showMenu} style={styles.headertext}>
+              <Icon name="menu-outline" size={55}></Icon>
+            </Text>
+          }
+          onRequestClose={hideMenu}
+        >
+          <MenuItem
+            onPress={() => {
+              seta("빠른시간 순");
+              setVisible(false);
+            }}
+          >
+            빠른시간 순 {"    "}
+            {a === "빠른시간 순" ? (
+              <Icon name="checkmark-outline" size={20} />
+            ) : (
+              ""
+            )}
+          </MenuItem>
+          <MenuDivider />
+          <MenuItem
+            onPress={() => {
+              seta("최저요금 순");
+              setVisible(false);
+            }}
+          >
+            최저요금 순{"    "}
+            {a === "최저요금 순" ? (
+              <Icon
+                style={{ direction: "rtl" }}
+                name="checkmark-outline"
+                size={20}
+              />
+            ) : (
+              ""
+            )}
+          </MenuItem>
+          <MenuDivider />
+          <MenuItem
+            onPress={() => {
+              seta("최저환승 순");
+              setVisible(false);
+            }}
+          >
+            최저환승 순{"    "}
+            {a === "최저환승 순" ? (
+              <Icon
+                style={{ direction: "rtl" }}
+                name="checkmark-outline"
+                size={20}
+              />
+            ) : (
+              ""
+            )}
+          </MenuItem>
+        </Menu>
       </View>
       <View style={styles.contents}>
         <FlatList
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item, index) => index.toString()}
           extraData={data}
           data={data}
           renderItem={(itemData) => <ItemRender item={itemData.item} />}
         />
       </View>
-      <Text>{route.params.id}</Text>
     </SafeAreaView>
   );
 }

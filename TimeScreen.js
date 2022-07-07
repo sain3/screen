@@ -10,7 +10,6 @@ import {
 import DropDownPicker from "react-native-dropdown-picker";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { format } from "date-fns";
-import Icon from "react-native-vector-icons/Ionicons";
 function Insert({ navigation }) {
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState(null);
@@ -48,7 +47,7 @@ function Insert({ navigation }) {
       let dtime = a[0] * 60 + a[1];
       navigation.navigate("List", {
         id: value,
-        ttime: dtime,
+        ttime: departtime,
       });
     } else {
       alert("요일을 선택하세요!");
@@ -142,10 +141,12 @@ export default Insert;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    display: "flex",
     backgroundColor: "#e1f5fe",
   },
   header: {
     flex: 0.8,
+    display: "flex",
     alignItems: "center",
     backgroundColor: "white",
   },
@@ -157,9 +158,11 @@ const styles = StyleSheet.create({
 
   content: {
     flex: 1.1,
+    display: "flex",
     alignItems: "center",
   },
   input: {
+    display: "flex",
     width: 300,
     height: 350,
     backgroundColor: "white",
@@ -175,6 +178,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   button: {
+    display: "flex",
     marginTop: 60,
     justifyContent: "center",
     alignItems: "center",

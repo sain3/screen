@@ -54,6 +54,7 @@ const styles = StyleSheet.create({
   },
 
   container: {
+    display: "flex",
     flex: 1,
     backgroundColor: "#e1f5fe",
   },
@@ -63,12 +64,14 @@ const styles = StyleSheet.create({
     marginBottom: 0,
   },
   footer: {
+    display: "flex",
     marginTop: 20,
     flex: 0,
     justifyContent: "center",
     alignItems: "center",
   },
   button: {
+    display: "flex",
     marginTop: 4,
     alignItems: "center",
     justifyContent: "center",

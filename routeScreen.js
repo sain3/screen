@@ -13,6 +13,9 @@ import Icon from "react-native-vector-icons/Ionicons";
 function Routes({ route, navigation }) {
   const [day, setday] = useState("");
   const sorted = () => setday(day.sort);
+  function addAlarm() {
+    alert("알람이 저장되었습니다.");
+  }
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
@@ -22,9 +25,9 @@ function Routes({ route, navigation }) {
           </Text>
         </TouchableOpacity>
         <Text style={styles.headertext}>이동 경로</Text>
-        <TouchableOpacity onPress={() => navigation.navigate("Input")}>
+        <TouchableOpacity onPress={() => addAlarm()}>
           <Text style={styles.headertext}>
-            <Icon name="menu-outline" size={55}></Icon>
+            <Icon name="add-outline" size={50}></Icon>
           </Text>
         </TouchableOpacity>
       </View>
