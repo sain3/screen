@@ -7,42 +7,100 @@ import {
   SafeAreaView,
   FlatList,
   TouchableOpacity,
+  Button,
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import { Menu, MenuItem, MenuDivider } from "react-native-material-menu";
 import * as SQLite from "expo-sqlite";
+import Getroute from "./getroute";
+import InTime from "./InTime";
+import OutTime from "./OutTime";
+import { es } from "date-fns/locale";
 
 const db = SQLite.openDatabase("db.db");
 
 function Lists({ navigation, route }) {
-  const [data, setdata] = useState([]);
-  const [sortdata, setsortdata] = useState([]);
-  useEffect(() => {
-    b();
-    async function b() {
-      let incitydata = await InData();
-      let database = await IncityDB(incitydata);
-    }
-    async function InData() {
-      return new Promise(function (resolve) {
-        db.transaction((tx) => {
-          let name = [];
-          tx.executeSql(`select * from home`, [], (tx, result) => {
-            for (let i = 0; i < result.rows.length; ++i) {
-              name.push(result.rows._array[i]);
-              setdata(name);
-              console.log(data);
+  let [data, setdata] = useState([]);
+  let [sortdata, setsortdata] = useState([]);
+  let [Okay, setOkay] = useState(false);
+  let [mode, setmode] = useState(false);
+
+  async function T(incity, outcity) {
+    let i = await InTime(incity, route.params.id, route.params.ttime);
+    console.log("i", i);
+    let e = await ReadDB(i);
+    let t = await OutTime(outcity, route.params.id, route.params.ttime);
+    let j = await ReadDB(t);
+    console.log("t", t);
+    // let e = await ReadDB(i, t);
+  }
+  async function ReadDB(a) {
+    console.log("db시작");
+    let all = [];
+    db.transaction((tx) => {
+      tx.executeSql(`select * from InCity`, [], (tx, result) => {
+        if (result.rows.length === 0) {
+          console.log("db is empty");
+        } else {
+          for (let i = 0; i < result.rows.length; ++i) {
+            if (all.includes(result.rows._array)) {
+            } else {
+              all.push(result.rows._array[i]);
+              setdata(all);
             }
-          });
-        });
+          }
+        }
       });
-    }
+    });
+    db.transaction((tx) => {
+      tx.executeSql(`select * from Out`, [], (tx, result) => {
+        if (result.rows.length === 0) {
+          console.log("db is empty");
+        } else {
+          for (let i = 0; i < result.rows.length; ++i) {
+            if (all.includes(result.rows._array)) {
+            } else {
+              all.push(result.rows._array[i]);
+              setdata(all);
+            }
+          }
+        }
+        setOkay(true);
+        console.log("All", all);
+      });
+    });
+  }
+  useEffect(() => {
+    let incity = [];
+    let outcity = [];
+    db.transaction(async (tx) => {
+      tx.executeSql(`DELETE from Out where Schedule`);
+      tx.executeSql(`DELETE from InCity where Schedule`);
+      tx.executeSql(`select * from InCity`, [], (tx, result) => {
+        if (result.rows.length === 0) {
+          console.log("db is empty");
+        }
+        for (let i = 0; i < result.rows.length; i++) {
+          incity.push(result.rows._array[i]);
+        }
+      });
+      tx.executeSql(`select * from Out`, [], (tx, result) => {
+        if (result.rows.length === 0) {
+          console.log("db is empty");
+        }
+        for (let i = 0; i < result.rows.length; i++) {
+          outcity.push(result.rows._array[i]);
+        }
+        T(incity, outcity);
+      });
+    });
   }, []);
-  const [a, seta] = useState("");
+
+  let [a, seta] = useState("");
   useEffect(() => {
     setsortdata(sortdata);
   }, []);
-  const [visible, setVisible] = useState(false);
+  let [visible, setVisible] = useState(false);
   const hideMenu = () => {
     setVisible(false);
   };
@@ -61,41 +119,65 @@ function Lists({ navigation, route }) {
     let minute = (current - a) % 60;
     return `${hour}시 ${minute}분`;
   };
+
   const ItemRender = ({ item }) => (
-    <TouchableOpacity
-      onPress={() =>
-        navigation.navigate("Route", {
-          id: item.id,
-          ns: route.params.id,
-        })
-      }
-    >
-      <SafeAreaView>
-        <View style={styles.list}>
-          <Text style={styles.itemtime}>
-            도착시간 : {setTime(item.totalTime)}
+    <TouchableOpacity>
+      <View style={styles.list}>
+        <Text style={styles.itemtime}>
+          출발시간 :
+          <Text
+            style={
+              item.Schedule === "운행시간 전 입니다."
+                ? styles.itemtime2
+                : styles.itemtime
+            }
+          >
+            {item.Schedule}
           </Text>
-          <View style={styles.path}>
-            {item.pathType === 2 ? (
-              <Icon size={50} name="bus-outline"></Icon>
-            ) : (
-              <Icon size={50} name="train-outline"></Icon>
-            )}
-            {item.pathType === 2 ? (
-              <Text>{item.number}</Text>
-            ) : (
-              <Text>{item.subwayName}</Text>
-            )}
-          </View>
-          <Text style={styles.fare}>요금 : {item.fare.toLocaleString()}원</Text>
+        </Text>
+        <View style={styles.path}>
+          {item.PathType === 2 ? (
+            <Icon size={50} name="bus-outline"></Icon>
+          ) : (
+            <Icon size={50} name="train-outline"></Icon>
+          )}
+
+          <Text>{item.Name}</Text>
         </View>
-      </SafeAreaView>
+        <Text style={styles.fare}>요금 : {item.Fare.toLocaleString()}원</Text>
+      </View>
     </TouchableOpacity>
   );
+  // if (route.params.ttime <= 54020) {
+  //   if (route.params.id === "화" || "수" || "목" || "금") {
+  //     return (
+  //       <View style={styles.footer}>
+  //         <Button title="조건11-2-32" onPress={() => Alert.alert("셔틀버스")} />
+  //       </View>
+  //     );
+  //   } else if (route.params.id === "월") {
+  //     return (
+  //       <View style={styles.footer}>
+  //         <Button title="조건11-2-31" onPress={() => Alert.alert("셔틀버스")} />
+  //       </View>
+  //     );
+  //   }
+  // } else if (route.params.ttime <= 60020 && route.params.ttime >= 60000) {
+  //   return (
+  //     <View style={styles.footer}>
+  //       <Button title="조건12-2" onPress={() => Alert.alert("셔틀버스")} />
+  //     </View>
+  //   );
+  // }
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
+        <TouchableOpacity
+          onPress={() => {
+            navigation.goBack();
+            Getroute();
+          }}
+        >
           <Text style={styles.headertext}>
             <Icon name="chevron-back-outline" size={55}></Icon>
           </Text>
@@ -162,12 +244,16 @@ function Lists({ navigation, route }) {
         </Menu>
       </View>
       <View style={styles.contents}>
-        <FlatList
-          keyExtractor={(item, index) => index.toString()}
-          extraData={data}
-          data={data}
-          renderItem={(itemData) => <ItemRender item={itemData.item} />}
-        />
+        {Okay ? (
+          <FlatList
+            keyExtractor={(item, index) => index.toString()}
+            extraData={data}
+            data={data}
+            renderItem={(itemData) => <ItemRender item={itemData.item} />}
+          />
+        ) : (
+          <Text>데이터를 받아오고 있습니다.</Text>
+        )}
       </View>
     </SafeAreaView>
   );
@@ -209,9 +295,16 @@ const styles = StyleSheet.create({
     borderStyle: "solid",
     borderBottomWidth: 2,
   },
+  no: {},
   itemtime: {
     textAlign: "left",
     fontSize: 33,
+  },
+  itemtime2: {
+    textAlign: "left",
+    fontSize: 25,
+    fontWeight: "bold",
+    fontStyle: "italic",
   },
   path: {
     position: "absolute",

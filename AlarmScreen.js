@@ -99,7 +99,7 @@ function Alarm({ navigation }) {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
+        <TouchableOpacity onPress={() => navigation.navigate("HOME")}>
           <Text style={styles.headertext}>
             <Icon name="chevron-back-outline" size={55}></Icon>
           </Text>
